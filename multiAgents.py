@@ -136,41 +136,63 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         # util.raiseNotDefined()
         
+        # start the search from the root node, with pacman as the first agent
         return self.minimaxSearch(gameState, 0, 0)[1]
 
     def minimaxSearch(self, state, depth, agent):
+        """
+        This function is called whenever a change of turn occurs, i.e. when a ghost or pacman has to make a decision.
+        It checks if the conditions to stop the search are met and, if not, calls the appropriate function (maxValue or minValue) to continue.
+        """
+        
         totalAgents = state.getNumAgents()
 
+        # when every partecipant has moved (the index of the current agent exceeds the total number of agents), restarts from the first one (pacman)
         if agent >= totalAgents:
             agent = 0
 
+        # when the game achieved a terminal state, i.e. the tree has achieved maximum depth or pacman has already won or lost, return the utility 
         if depth == self.depth * totalAgents or state.isWin() or state.isLose():
             return self.evaluationFunction(state), None
         
         if agent == 0:
+            # pacman's turn, so we want to maximize the value of the state
             return self.maxValue(state, depth, agent)
         else:
+            # ghost's turn, so we want to minimize the value of the state
             return self.minValue(state, depth, agent)
         
     def maxValue(self, state, depth, agent):
+        """
+        This function is called when Pacman makes a decision: it returns the move that maximizes the cost function value, and the value itself.
+        """
+
         v, move = float("-inf"), None
 
+        # evaluates each possible move's outcome value and chooses the one that maximizes it
         for action in state.getLegalActions(agent):
             v2, a2 = self.minimaxSearch(state.generateSuccessor(agent, action), depth+1, agent+1)
 
             if v2 > v:
+                # if the value of the current state is higher than the previous one, update value and move
                 v, move = v2, action
         
         return v, move
 
 
     def minValue(self, state, depth, agent):
+        """
+        This function is called when a ghost makes a decision: it returns the move that minimizes the cost function value, and the value itself.
+        """
+        
         v, move = float("inf"), None
 
+        # evaluates each possible move's outcome value and chooses the one that minimizes it
         for action in state.getLegalActions(agent):
             v2, a2 = self.minimaxSearch(state.generateSuccessor(agent, action), depth+1, agent+1)
 
             if v2 < v:
+                # if the value of the current state is lower than the previous one, update value and move
                 v, move = v2, action
         
         return v, move
@@ -187,48 +209,80 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         # util.raiseNotDefined()
 
+        # start the search from the root node, with pacman as the first agent and alpha and beta set to negative and positive infinity respectively
         return self.alphabetaSearch(gameState, 0, 0, float("-inf"), float("inf"))[1]
 
     def alphabetaSearch(self, state, depth, agent, alpha, beta):
+        """
+        This function is called whenever a change of turn occurs, i.e. when a ghost or pacman has to make a decision.
+        It checks if the conditions to stop the search are met and, if not, calls the appropriate function (maxValue or minValue) to continue.
+        """
+
         totalAgents = state.getNumAgents()
 
+        # when every partecipant has moved (the index of the current agent exceeds the total number of agents), restarts from the first one (pacman)
         if agent >= totalAgents:
             agent = 0
 
+       # when the game achieved a terminal state, i.e. the tree has achieved maximum depth or pacman has already won or lost, return the utility 
         if depth == self.depth * totalAgents or state.isWin() or state.isLose():
             return self.evaluationFunction(state), None
         
         if agent == 0:
+            # pacman's turn, so we want to maximize the value of the state
             return self.maxValue(state, depth, agent, alpha, beta)
         else:
+            # ghost's turn, so we want to minimize the value of the state
             return self.minValue(state, depth, agent, alpha, beta)
-        
-    def maxValue(self, state, depth, agent, alpha, beta):
-        v, move = float("-inf"), None
 
+    
+    def maxValue(self, state, depth, agent, alpha, beta):
+        """
+        This function is called when Pacman makes a decision: it returns the move that maximizes the cost function value, and the value itself.
+        In addition to that, it stops the current search as soon as it obtains a value higher than the min's upper bound.
+        It also updates the value of alpha, which represents the max's lower bound.
+        """
+
+        v, move = float("-inf"), None
+        
+        # evaluates each possible move's outcome value and chooses the one that maximizes it
         for action in state.getLegalActions(agent):
+             #Calls the function recursively for each possible action in order to expand the decision tree
             v2, a2 = self.alphabetaSearch(state.generateSuccessor(agent, action), depth+1, agent+1, alpha, beta)
             
             if v2 > v:
+                # if the value of the current state is higher than the previous one, update value, move and alpha
                 v, move = v2, action
                 alpha = max(alpha, v)
 
             if v > beta:
+                # if the value of the current state is higher than the min's upper bound, return the current value and move
                 return v, move
         
         return v, move
     
+   
     def minValue(self, state, depth, agent, alpha, beta):
+        """
+        This function is called when a ghost makes a decision: it returns the move that minimizes the cost function value, and the value itself.
+        In addition to that, it stops the current search as soon as it obtains a value lower than the max's upper bound.
+        It also updates the value of beta, which represents the min's upper bound.
+        """
+        
         v, move = float("inf"), None
 
+        # evaluates each possible move's outcome value and chooses the one that minimizes it
         for action in state.getLegalActions(agent):
+            #Calls the function recursively for each possible action in order to expand the decision tree
             v2, a2 = self.alphabetaSearch(state.generateSuccessor(agent, action), depth+1, agent+1, alpha, beta)
             
             if v2 < v:
+                # if the value of the current state is lower than the previous one, update value, move and beta
                 v, move = v2, action
                 beta = min(beta, v)
 
             if v < alpha:
+                # if the value of the current state is lower than the max's upper bound, return the current value and move
                 return v, move
             
         return v, move
