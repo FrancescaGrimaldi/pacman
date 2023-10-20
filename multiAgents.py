@@ -247,7 +247,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         
         # evaluates each possible move's outcome value and chooses the one that maximizes it
         for action in state.getLegalActions(agent):
-             #Calls the function recursively for each possible action in order to expand the decision tree
+            # calls the function recursively for each possible action in order to expand the decision tree
             v2, a2 = self.alphabetaSearch(state.generateSuccessor(agent, action), depth+1, agent+1, alpha, beta)
             
             if v2 > v:
@@ -273,7 +273,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         # evaluates each possible move's outcome value and chooses the one that minimizes it
         for action in state.getLegalActions(agent):
-            #Calls the function recursively for each possible action in order to expand the decision tree
+            # calls the function recursively for each possible action in order to expand the decision tree
             v2, a2 = self.alphabetaSearch(state.generateSuccessor(agent, action), depth+1, agent+1, alpha, beta)
             
             if v2 < v:
